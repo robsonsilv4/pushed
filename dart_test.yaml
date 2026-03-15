@@ -1,0 +1,6 @@
+# Dart test configuration
+skip: false
+tags:
+  untagged: null
+update_goldens: false
+verbose: false

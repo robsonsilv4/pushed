@@ -1,0 +1,8 @@
+.github/
+example/
+test/
+.dart_tool/
+analysis_options.yaml
+dart_test.yaml
+CONTRIBUTING.md
+.gitignore
