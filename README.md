@@ -20,9 +20,9 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  pushed: ^0.1.0
-  go_router: ^14.0.0
-  get_it: ^7.6.0
+  pushed: ^0.2.1
+  go_router: ^17.0.0
+  get_it: ^9.0.0
 ```
 
 Then run:
@@ -54,14 +54,16 @@ GoRouter(
 ```dart
 GoRoute(
   path: '/products',
-  builder: (context, state) => ProductsPage(),
+  name: 'products',
+  builder: (context, state) => const ProductsPage(),
 ).withScope(
   observer: scopeObserver,
   scopeInitializer: (getIt) {
     getIt.registerSingleton<ProductService>(ProductService());
   },
   scopeDisposer: (getIt) async {
-    // cleanup if needed
+    final service = getIt<ProductService>();
+    await service.dispose();
   },
 )
 ```
@@ -70,19 +72,25 @@ GoRoute(
 
 ```dart
 class ProductsPage extends StatelessWidget {
+  const ProductsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final productService = GetIt.instance<ProductService>();
-    return // your UI
+    return Scaffold(
+      body: // use productService
+    );
   }
 }
 ```
 
 ## 📚 Complete Example
 
-See the [example app](example/) for a complete working example with:
-- Multiple routes with scoped dependencies
-- Service lifecycle management
+See the [example app](example/) for a complete working example demonstrating:
+- Creating a `ScopeObserver`
+- Registering scoped dependencies
+- Accessing dependencies with `GetIt`
+- Automatic cleanup when routes are popped
 
 Run the example:
 ```bash
@@ -93,19 +101,19 @@ flutter run
 ## 💡 Scope Lifecycle
 
 ```
-Navigate to /products
+Navigate to route with scope
   ↓
-ScopeObserver detects route change
+ScopeObserver detects route push
   ↓
-ScopeInitializer called
+scopeInitializer called
   ↓
-Services registered in GetIt
+Services registered in GetIt scope
   ↓
-Page can access services via GetIt.instance<Service>()
+Page can access via GetIt.instance<Service>()
   ↓
-Navigate away from /products
+Navigate away / route popped
   ↓
-ScopeDisposer called
+scopeDisposer called
   ↓
 Services removed from GetIt
   ↓
@@ -114,19 +122,7 @@ Memory freed
 
 ## 🎯 Best Practices
 
-### 1. Always initialize services in `scopeInitializer`
-
-```dart
-.withScope(
-  observer: observer,
-  scopeInitializer: (getIt) {
-    getIt.registerSingleton<UserService>(UserService());
-    getIt.registerSingleton<AuthService>(AuthService());
-  },
-)
-```
-
-### 2. Clean up resources in `scopeDisposer`
+### 1. Always use `scopeDisposer` for cleanup
 
 ```dart
 .withScope(
@@ -140,17 +136,22 @@ Memory freed
 )
 ```
 
-### 3. Use hierarchical scopes for related routes
+### 2. Register multiple related services
+
+```dart
+scopeInitializer: (getIt) {
+  getIt.registerSingleton<UserService>(UserService());
+  getIt.registerSingleton<AuthService>(AuthService());
+  getIt.registerSingleton<PreferencesService>(PreferencesService());
+}
+```
+
+### 3. Use hierarchical scopes for nested routes
 
 ```dart
 GoRoute(
   path: '/products',
   builder: (context, state) => ProductsPage(),
-).withScope(
-  observer: observer,
-  scopeInitializer: (getIt) {
-    getIt.registerSingleton<ProductService>(ProductService());
-  },
   routes: [
     GoRoute(
       path: ':id',
@@ -158,19 +159,43 @@ GoRoute(
     ).withScope(
       observer: observer,
       scopeInitializer: (getIt) {
-        // ProductService is still available from parent scope
-        getIt.registerSingleton<ReviewService>(ReviewService());
+        // Can access parent scope services
+        getIt.registerSingleton<ProductDetailService>(
+          ProductDetailService(),
+        );
       },
     ),
   ],
+).withScope(
+  observer: observer,
+  scopeInitializer: (getIt) {
+    getIt.registerSingleton<ProductService>(ProductService());
+  },
 )
+```
+
+## 🧪 Testing
+
+Use `resetAllScopes()` in tests:
+
+```dart
+test('my test', () async {
+  final router = createRouter();
+  
+  // Navigate and test
+  // ...
+  
+  // Cleanup
+  await router.resetAllScopes();
+});
 ```
 
 ## 📈 Performance
 
-- Minimal overhead - scopes are created/disposed only when needed
-- No global state pollution - each scope is isolated
-- Efficient memory management - automatic cleanup prevents leaks
+- **Minimal overhead** - Scopes created/disposed only when needed
+- **No global state pollution** - Each scope is isolated
+- **Efficient memory management** - Automatic cleanup prevents leaks
+- **Type-safe** - Full Dart type checking at compile time
 
 ## 🐛 Troubleshooting
 
@@ -178,30 +203,19 @@ GoRoute(
 
 **Problem**: `GetIt.get<MyService>() not found`
 
-**Cause**: The scope hasn't been initialized yet
-
 **Solution**: 
-- Ensure you've navigated to the route with the scoped service
-- Verify the service is registered in `scopeInitializer`
-- Check that `ScopeObserver` is added to `GoRouter`
+- Ensure `ScopeObserver` is added to `GoRouter.observers`
+- Verify service is registered in `scopeInitializer`
+- Check that you've navigated to the route
 
 ### Memory leaks
 
-**Problem**: Services are not being cleaned up
+**Problem**: Services not being cleaned up
 
 **Solution**:
 - Implement `scopeDisposer` callbacks
-- Ensure disposer methods actually clean up resources
-- Call `dispose()` on services that need cleanup
-
-### Scope conflicts
-
-**Problem**: Services from different scopes interfering
-
-**Solution**:
-- Use unique service names for different scopes
-- Avoid registering globally when you need scoped services
-- Check `GetIt.isRegistered<Service>()` before registering
+- Ensure services implement proper cleanup
+- Use `router.resetAllScopes()` in tests
 
 ## 📝 Changelog
 
@@ -209,7 +223,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see the example app and tests for patterns.
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📄 License
 
@@ -221,6 +235,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [`get_it`](https://pub.dev/packages/get_it) - Service locator for Dart
 - [`provider`](https://pub.dev/packages/provider) - State management
 
-## 📧 Support
+## 💬 Support
 
-For issues, questions, or suggestions, please open an issue on GitHub.
+For issues, questions, or suggestions, please [open an issue](https://github.com/robsonsilv4/pushed/issues) on GitHub.
+
+---
+
+Made with ❤️ by [Robson Silva](https://github.com/robsonsilv4) with assistance from AI.
