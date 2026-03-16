@@ -20,13 +20,13 @@ void main() {
       // Clean up after each test
       try {
         await manager.resetAllScopes();
-      } catch (e) {
+      } on Exception {
         // Ignore cleanup errors
       }
 
       try {
         await getIt.reset();
-      } catch (e) {
+      } on Exception {
         // Ignore cleanup errors
       }
     });
