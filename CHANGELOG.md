@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.2.0]
+
+### Changed
+- Updated get_it from ^7.6.0 to ^9.2.1
+- Updated go_router from ^14.0.0 to ^17.1.0
+- Updated equatable from ^2.0.0 to ^2.0.8
+- Updated very_good_analysis from ^6.0.0 to ^10.2.0
+- Enhanced SDK constraints for better stability and compatibility
+
+### Added
+- Complete export of public API in main library file (ScopeObserver, extensions)
+- Improved type safety and documentation
+- Support for latest go_router features and improvements
+- Enhanced compatibility with latest get_it service locator features
+
+### Fixed
+- Fixed missing exports for ScopeObserver and GoRoute/GoRouter extensions
+
 ## [0.1.0]
 
 ### Added
