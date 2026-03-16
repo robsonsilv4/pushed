@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1]
+
+### Added
+- Example app demonstrating scoped dependencies with pushed package
+
 ## [0.2.0]
 
 ### Changed
@@ -14,6 +19,7 @@
 - Improved type safety and documentation
 - Support for latest go_router features and improvements
 - Enhanced compatibility with latest get_it service locator features
+- MIT License content
 
 ### Fixed
 - Fixed missing exports for ScopeObserver and GoRoute/GoRouter extensions

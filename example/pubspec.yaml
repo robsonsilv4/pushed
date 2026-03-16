@@ -1,0 +1,24 @@
+name: pushed_example
+description: Simple example demonstrating pushed package for scoped dependencies.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get_it: ^9.2.1
+  go_router: ^17.1.0
+  pushed:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^10.2.0
+
+flutter:
+  uses-material-design: true
