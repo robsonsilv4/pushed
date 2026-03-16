@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -192,23 +194,25 @@ class ScopeObserver extends NavigatorObserver {
       );
     }
 
-    scopeManager.createRouteScope(config).then((_) {
-      _activeRouteScopes[routeName] = config.effectiveScopeName;
+    unawaited(
+      scopeManager.createRouteScope(config).then((_) {
+        _activeRouteScopes[routeName] = config.effectiveScopeName;
 
-      if (enableLogging) {
-        debugPrint(
-          '[ScopeObserver] Scope created successfully for route: $routeName',
-        );
-      }
-    }).catchError(
-      (Object error, StackTrace stackTrace) {
-        debugPrint(
-          '[ScopeObserver] Error creating scope for route "$routeName": $error',
-        );
-        if (kDebugMode) {
-          debugPrintStack(stackTrace: stackTrace);
+        if (enableLogging) {
+          debugPrint(
+            '[ScopeObserver] Scope created successfully for route: $routeName',
+          );
         }
-      },
+      }).catchError(
+        (Object error, StackTrace stackTrace) {
+          debugPrint(
+            '[ScopeObserver] Error creating scope for route "$routeName": $error',
+          );
+          if (kDebugMode) {
+            debugPrintStack(stackTrace: stackTrace);
+          }
+        },
+      ),
     );
   }
 
@@ -226,29 +230,31 @@ class ScopeObserver extends NavigatorObserver {
       );
     }
 
-    scopeManager.disposeRouteScope(config).then((disposed) {
-      if (disposed) {
-        _activeRouteScopes.remove(routeName);
+    unawaited(
+      scopeManager.disposeRouteScope(config).then((disposed) {
+        if (disposed) {
+          _activeRouteScopes.remove(routeName);
 
-        if (enableLogging) {
+          if (enableLogging) {
+            debugPrint(
+              '[ScopeObserver] Scope disposed successfully for route: $routeName',
+            );
+          }
+        } else if (enableLogging) {
           debugPrint(
-            '[ScopeObserver] Scope disposed successfully for route: $routeName',
+            '[ScopeObserver] Scope was not active for route: $routeName',
           );
         }
-      } else if (enableLogging) {
-        debugPrint(
-          '[ScopeObserver] Scope was not active for route: $routeName',
-        );
-      }
-    }).catchError(
-      (Object error, StackTrace stackTrace) {
-        debugPrint(
-          '[ScopeObserver] Error disposing scope for route "$routeName": $error',
-        );
-        if (kDebugMode) {
-          debugPrintStack(stackTrace: stackTrace);
-        }
-      },
+      }).catchError(
+        (Object error, StackTrace stackTrace) {
+          debugPrint(
+            '[ScopeObserver] Error disposing scope for route "$routeName": $error',
+          );
+          if (kDebugMode) {
+            debugPrintStack(stackTrace: stackTrace);
+          }
+        },
+      ),
     );
   }
 

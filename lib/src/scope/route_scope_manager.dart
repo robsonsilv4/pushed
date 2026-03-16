@@ -93,7 +93,7 @@ class RouteScopeManager {
       if (dispose) {
         try {
           await _getIt.popScope();
-        } catch (e) {
+        } on Exception {
           // If we can't pop (e.g., already on base scope), just clear the list
           break;
         }
