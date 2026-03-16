@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.2]
+
+### Changed
+- Reorganized pubspec.yaml with repository, homepage, and issue_tracker fields
+- Updated README with better formatting and support section
+
+### Added
+- Topics metadata in pubspec.yaml for better discoverability
+- GitHub workflows for testing and publishing
+
+### Fixed
+- Updated footer in README with proper attribution
+
 ## [0.2.1]
 
 ### Added

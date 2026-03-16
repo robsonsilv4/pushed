@@ -1,6 +1,15 @@
 name: pushed
 description: Scoped dependencies for go_router routes using get_it. Manage route-specific dependencies with automatic lifecycle management.
-version: 0.2.1
+version: 0.2.2
+repository: https://github.com/robsonsilv4/pushed
+homepage: https://github.com/robsonsilv4/pushed
+issue_tracker: https://github.com/robsonsilv4/pushed/issues
+topics:
+  - go-router
+  - dependency-injection
+  - get-it
+  - scoped-dependencies
+  - flutter
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
