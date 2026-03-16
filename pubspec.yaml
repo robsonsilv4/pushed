@@ -1,7 +1,6 @@
 name: pushed
 description: Scoped dependencies for go_router routes using get_it. Manage route-specific dependencies with automatic lifecycle management.
 version: 0.2.1
-publish_to: none
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
